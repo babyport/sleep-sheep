@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐑 ねむりの羊スタンプカード</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+
+  :root {
+    --pink: #ffb3c6; --pink2: #ff8fab;
+    --lav: #c8b4e8; --lav2: #a890d8;
+    --green: #a8d8a8; --green2: #7bc47b;
+    --gold: #f0c040; --gold2: #e8b020;
+    --night: #1a1a3a; --navy: #2a2a5a;
+    --star: #ffe060;
+    --text: #4a3728; --sub: #8a7060;
+    --shadow: rgba(74,55,40,0.13);
+    --wool: #f8f4ee;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    background: linear-gradient(180deg, #0e0e2a 0%, #1a1a4a 40%, #2d1a4a 70%, #3d1a3a 100%);
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 20px 14px 50px;
+    overflow-x: hidden;
+  }
+
+  /* ── Stars background ── */
+  .bg-stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-star {
+    position: absolute; background: white; border-radius: 50%;
+    animation: twinkle ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  /* ── App wrapper ── */
+  .app { position: relative; z-index: 1; width: 100%; max-width: 400px; }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 20px; padding-top: 6px; }
+  .header h1 {
+    font-size: 1.65rem; font-weight: 700; color: white;
+    text-shadow: 0 0 20px rgba(200,180,255,0.8), 0 2px 4px rgba(0,0,0,0.4);
+    letter-spacing: 0.04em;
+  }
+  .header p { font-size: 0.8rem; color: rgba(200,180,255,0.7); margin-top: 5px; }
+
+  /* ── Main scene card ── */
+  .scene-card {
+    background: linear-gradient(160deg, #12123a, #1e1048);
+    border-radius: 28px;
+    padding: 20px 16px 18px;
+    border: 1.5px solid rgba(200,180,255,0.2);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .scene-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(200,180,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Day info row ── */
+  .day-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+  }
+  .day-box {
+    background: rgba(200,180,255,0.12); border: 1.5px solid rgba(200,180,255,0.25);
+    border-radius: 16px; padding: 8px 14px; text-align: center; flex-shrink: 0;
+  }
+  .day-box .num { font-size: 1.8rem; font-weight: 700; color: white; line-height: 1; }
+  .day-box .num span { font-size: 0.85rem; color: rgba(200,180,255,0.7); }
+  .day-msg {
+    background: rgba(200,180,255,0.08); border: 1px solid rgba(200,180,255,0.15);
+    border-radius: 14px; padding: 10px 13px; flex: 1;
+    font-size: 0.82rem; color: rgba(255,255,255,0.85); line-height: 1.5;
+  }
+
+  /* ── Scene: sheep + sweater ── */
+  .scene-wrap {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0px;
+    margin-bottom: 14px;
+    min-height: 180px;
+    position: relative;
+  }
+
+  /* Sheep SVG wrapper */
+  .sheep-col {
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; user-select: none;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .sheep-col:active { transform: scale(0.93)!important; }
+  .sheep-svg { width: 160px; height: 160px; overflow: visible; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4)); }
+
+  /* Floating stars around sheep (milestone) */
+  .float-stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .fstar {
+    position: absolute;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    animation: floatStar 3s ease-in-out infinite;
+  }
+  .fstar.visible { opacity: 1; }
+  @keyframes floatStar {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(15deg); }
+  }
+
+  .tap-hint {
+    font-size: 0.75rem; color: var(--pink); font-weight: 700;
+    margin-top: 6px; animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.4;} }
+
+  /* Sweater column */
+  .sweater-col {
+    display: flex; flex-direction: column; align-items: center;
+    flex-shrink: 0;
+    margin-bottom: 8px;
+    margin-left: -8px;
+  }
+  .sweater-label {
+    font-size: 0.65rem; color: rgba(200,180,255,0.55); font-weight: 700;
+    margin-bottom: 4px; letter-spacing: 0.05em;
+  }
+  .sweater-svg { width: 110px; height: 150px; overflow: visible; }
+
+  /* ── Progress ── */
+  .progress-section { margin-bottom: 14px; }
+  .progress-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.72rem; color: rgba(200,180,255,0.6); font-weight: 600; margin-bottom: 5px;
+  }
+  .progress-bar {
+    height: 10px; background: rgba(255,255,255,0.08); border-radius: 99px;
+    overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #a890d8, #ffb3c6, #f0c040);
+    transition: width 0.9s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative; overflow: hidden;
+  }
+  .progress-fill::after {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+  @keyframes shimmer { to { left: 200%; } }
+
+  /* ── Stamp button ── */
+  .stamp-btn {
+    width: 100%; padding: 15px; border: none; border-radius: 18px;
+    font-family: 'Zen Maru Gothic', sans-serif; font-size: 1rem; font-weight: 700; color: white;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: linear-gradient(135deg, var(--pink), var(--pink2));
+    box-shadow: 0 4px 20px rgba(255,100,140,0.4);
+    transition: all 0.2s; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .stamp-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,100,140,0.5); }
+  .stamp-btn:disabled { background: linear-gradient(135deg, #3a3a5a, #2a2a4a); box-shadow: none; cursor: not-allowed; color: rgba(255,255,255,0.4); }
+  .stamp-btn.done { background: linear-gradient(135deg, #2a6a4a, #1a5a3a); box-shadow: 0 4px 16px rgba(50,150,100,0.35); color: rgba(255,255,255,0.8); }
+
+  /* ── Calendar card ── */
+  .cal-card {
+    background: linear-gradient(160deg, #12123a, #1e1048);
+    border-radius: 24px; padding: 18px 16px;
+    border: 1.5px solid rgba(200,180,255,0.2);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  .cal-title { font-size: 0.85rem; font-weight: 700; color: rgba(200,180,255,0.8); margin-bottom: 12px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 4px; }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 700;
+    background: rgba(255,255,255,0.05); color: rgba(200,180,255,0.3);
+    border: 1px solid transparent; transition: all 0.3s; position: relative;
+  }
+  .cal-day.done { background: rgba(200,180,255,0.15); color: rgba(255,255,255,0.7); border-color: rgba(200,180,255,0.25); }
+  .cal-day.done::after { content: '🐑'; position: absolute; font-size: 10px; bottom: -2px; right: -1px; }
+  .cal-day.milestone-done { background: rgba(255,220,60,0.2); border-color: rgba(255,220,60,0.4); color: var(--gold); }
+  .cal-day.milestone-done::after { content: '⭐'; font-size: 11px; bottom: -2px; right: -1px; }
+  .cal-day.milestone-upcoming { border-color: rgba(255,220,60,0.2); color: rgba(255,220,60,0.3); }
+  .cal-day.today {
+    background: linear-gradient(135deg, rgba(200,140,220,0.5), rgba(255,140,180,0.4));
+    color: white; border-color: rgba(255,180,220,0.6);
+    box-shadow: 0 0 12px rgba(200,140,220,0.4); transform: scale(1.1); z-index: 1;
+  }
+  .cal-day.today::after { display: none; }
+  .cal-day.future { opacity: 0.4; }
+
+  .reset-btn {
+    display: block; margin: 14px auto 0; background: none; border: none;
+    font-family: 'Zen Maru Gothic', sans-serif; font-size: 0.7rem;
+    color: rgba(200,180,255,0.3); cursor: pointer; text-decoration: underline; padding: 4px 8px;
+  }
+  .reset-btn:hover { color: rgba(200,180,255,0.7); }
+
+  /* ── Milestone alert ── */
+  .milestone-alert {
+    display: none; border-radius: 16px; padding: 12px 16px; text-align: center;
+    margin-bottom: 12px; font-size: 0.84rem; font-weight: 700;
+    background: rgba(255,220,60,0.15); border: 1.5px solid rgba(255,220,60,0.35);
+    color: var(--gold); animation: fadeSlide 0.5s ease;
+  }
+  .milestone-alert.show { display: block; }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;} }
+
+  /* ── Completion ── */
+  .completion {
+    background: linear-gradient(135deg, #1a0a3a, #2a0a2a);
+    border: 1.5px solid rgba(255,220,60,0.4);
+    border-radius: 24px; padding: 22px; text-align: center;
+    margin-bottom: 14px; display: none;
+  }
+  .completion.show { display: block; animation: fadeSlide 0.6s ease; }
+  .completion .big { font-size: 3.5rem; display: block; margin-bottom: 10px; }
+  .completion h2 { font-size: 1.25rem; font-weight: 700; color: var(--gold); }
+  .completion p { font-size: 0.82rem; color: rgba(255,255,255,0.65); margin-top: 6px; line-height: 1.6; }
+
+  /* ── Popup ── */
+  .popup-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .popup-overlay.show { opacity: 1; pointer-events: all; }
+  .popup {
+    background: linear-gradient(160deg, #1a1248, #24103c);
+    border: 1.5px solid rgba(200,180,255,0.3);
+    border-radius: 28px; padding: 32px 28px; text-align: center;
+    transform: scale(0.7) translateY(40px);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 290px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .popup-overlay.show .popup { transform: scale(1) translateY(0); }
+  .popup .pe { font-size: 3.2rem; display: block; margin-bottom: 10px; }
+  .popup h2 { font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 8px; }
+  .popup p { font-size: 0.83rem; color: rgba(200,180,255,0.8); line-height: 1.65; white-space: pre-line; }
+  .popup-close {
+    margin-top: 18px; padding: 11px 32px;
+    background: linear-gradient(135deg, var(--lav2), var(--pink2));
+    border: none; border-radius: 99px; font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 0.95rem; font-weight: 700; color: white; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(150,100,200,0.4);
+  }
+
+  /* ── Loading ── */
+  .loading-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(180deg, #0e0e2a, #1a1a4a);
+    z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; transition: opacity 0.5s;
+  }
+  .loading-overlay.hide { opacity: 0; pointer-events: none; }
+  .loading-sheep { font-size: 3.5rem; animation: bounce 0.7s ease-in-out infinite alternate; }
+  @keyframes bounce { from{transform:translateY(0);}to{transform:translateY(-12px);} }
+  .loading-text { font-size: 0.88rem; color: rgba(200,180,255,0.7); }
+  .loading-dots::after { content: ''; animation: dots 1.5s steps(4,end) infinite; }
+  @keyframes dots { 0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}100%{content:'';} }
+
+  /* ── Saving badge ── */
+  .saving-badge {
+    position: fixed; bottom: 20px; right: 14px; z-index: 50;
+    background: rgba(30,20,60,0.95); border-radius: 99px; padding: 7px 13px;
+    font-size: 0.72rem; font-weight: 700; color: rgba(200,180,255,0.8);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4); border: 1px solid rgba(200,180,255,0.2);
+    display: flex; align-items: center; gap: 6px;
+    opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; pointer-events: none;
+  }
+  .saving-badge.show { opacity: 1; transform: translateY(0); }
+  .saving-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green2); }
+  .saving-dot.spin { background: none; border: 2px solid var(--lav); border-top-color: transparent; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  /* ── Error banner ── */
+  .error-banner {
+    display: none; background: rgba(200,50,50,0.15); border: 1.5px solid rgba(200,80,80,0.4);
+    border-radius: 14px; padding: 10px 14px; text-align: center; margin-bottom: 12px;
+    font-size: 0.8rem; color: #ff9090; font-weight: 600;
+  }
+  .error-banner.show { display: block; }
+
+  /* ── Particles ── */
+  .particle { position: fixed; pointer-events: none; z-index: 200; border-radius: 50%; animation: fall linear forwards; }
+  @keyframes fall { 0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(700px) rotate(900deg);opacity:0;} }
+</style>
+</head>
+<body>
+
+<!-- Background twinkling stars -->
+<div class="bg-stars" id="bgStars"></div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-sheep">🐑</div>
+  <div class="loading-text">データを読み込み中<span class="loading-dots"></span></div>
+</div>
+
+<!-- Saving badge -->
+<div class="saving-badge" id="savingBadge">
+  <div class="saving-dot" id="savingDot"></div>
+  <span id="savingText">保存中...</span>
+</div>
+
+<div class="app">
+
+  <div class="header">
+    <h1>🌙 ねむりの羊 🐑</h1>
+    <p>30日間 睡眠サポートプログラム</p>
+  </div>
+
+  <!-- Completion -->
+  <div class="completion" id="completion">
+    <span class="big">🧶</span>
+    <h2>セーター完成！おめでとう！</h2>
+    <p>30日間やり遂げたね✨<br>羊の毛でセーターができたよ🐑</p>
+  </div>
+
+  <!-- Milestone alert -->
+  <div class="milestone-alert" id="milestoneAlert"></div>
+  <!-- Error -->
+  <div class="error-banner" id="errorBanner">⚠️ 保存に失敗しました。ローカルには保存済みです。</div>
+
+  <div class="scene-card">
+    <!-- Day row -->
+    <div class="day-row">
+      <div class="day-box"><div class="num" id="dayNum">1<span>日目</span></div></div>
+      <div class="day-msg" id="dayMsg">今日も運動してみよう！🌙</div>
+    </div>
+
+    <!-- Main scene: sheep + sweater -->
+    <div class="scene-wrap">
+
+      <!-- Floating milestone stars -->
+      <div class="float-stars" id="floatStars">
+        <!-- populated by JS -->
+      </div>
+
+      <!-- Sheep -->
+      <div class="sheep-col" id="sheepCol" onclick="tapSheep()">
+        <svg class="sheep-svg" id="sheepSvg" viewBox="0 0 160 170" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ground -->
+          <ellipse cx="80" cy="158" rx="56" ry="8" fill="#1a4a2a" opacity="0.6"/>
+          <path d="M44 154 Q42 145 46 140 Q50 145 48 154" fill="#2a6a3a" opacity="0.8"/>
+          <path d="M116 155 Q114 146 118 141 Q122 146 120 155" fill="#2a6a3a" opacity="0.7"/>
+
+          <!-- Legs -->
+          <rect x="57" y="126" width="9" height="28" rx="4.5" fill="#c8b090"/>
+          <rect x="71" y="128" width="9" height="26" rx="4.5" fill="#c8b090"/>
+          <rect x="88" y="126" width="9" height="28" rx="4.5" fill="#c8b090"/>
+          <rect x="102" y="128" width="9" height="26" rx="4.5" fill="#c8b090"/>
+          <ellipse cx="61.5" cy="154" rx="6" ry="3" fill="#7a5030"/>
+          <ellipse cx="75.5" cy="154" rx="6" ry="3" fill="#7a5030"/>
+          <ellipse cx="92.5" cy="154" rx="6" ry="3" fill="#7a5030"/>
+          <ellipse cx="106.5" cy="154" rx="6" ry="3" fill="#7a5030"/>
+
+          <!-- Body base -->
+          <ellipse cx="82" cy="112" rx="42" ry="34" fill="#f0ece4" stroke="#ddd0bc" stroke-width="1.5"/>
+
+          <!-- WOOL PUFFS (day 1-29, hidden on day 30) -->
+          <g id="woolGroup">
+            <circle class="wp" data-day="1"  cx="72"  cy="101" r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="2"  cx="92"  cy="101" r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="3"  cx="82"  cy="95"  r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="4"  cx="62"  cy="107" r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="5"  cx="102" cy="107" r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="6"  cx="70"  cy="92"  r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="7"  cx="94"  cy="92"  r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="8"  cx="52"  cy="112" r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="9"  cx="112" cy="112" r="0" fill="#faf7f2"/>
+            <circle class="wp" data-day="10" cx="82"  cy="86"  r="0" fill="#f5f0e8"/>
+            <circle class="wp" data-day="11" cx="60"  cy="98"  r="0" fill="#f5f0e8"/>
+            <circle class="wp" data-day="12" cx="104" cy="98"  r="0" fill="#f5f0e8"/>
+            <circle class="wp" data-day="13" cx="48"  cy="120" r="0" fill="#f5f0e8"/>
+            <circle class="wp" data-day="14" cx="116" cy="120" r="0" fill="#f5f0e8"/>
+            <circle class="wp" data-day="15" cx="82"  cy="80"  r="0" fill="#f5f0e8"/>
+            <circle class="wp" data-day="16" cx="68"  cy="120" r="0" fill="#f0ece4"/>
+            <circle class="wp" data-day="17" cx="96"  cy="120" r="0" fill="#f0ece4"/>
+            <circle class="wp" data-day="18" cx="45"  cy="105" r="0" fill="#f0ece4"/>
+            <circle class="wp" data-day="19" cx="119" cy="105" r="0" fill="#f0ece4"/>
+            <circle class="wp" data-day="20" cx="82"  cy="74"  r="0" fill="#f0ece4"/>
+            <circle class="wp" data-day="21" cx="55"  cy="90"  r="0" fill="#eae4d8"/>
+            <circle class="wp" data-day="22" cx="109" cy="90"  r="0" fill="#eae4d8"/>
+            <circle class="wp" data-day="23" cx="43"  cy="118" r="0" fill="#eae4d8"/>
+            <circle class="wp" data-day="24" cx="121" cy="118" r="0" fill="#eae4d8"/>
+            <circle class="wp" data-day="25" cx="82"  cy="68"  r="0" fill="#eae4d8"/>
+            <circle class="wp" data-day="26" cx="62"  cy="126" r="0" fill="#e4dcd0"/>
+            <circle class="wp" data-day="27" cx="102" cy="126" r="0" fill="#e4dcd0"/>
+            <circle class="wp" data-day="28" cx="40"  cy="108" r="0" fill="#e4dcd0"/>
+            <circle class="wp" data-day="29" cx="124" cy="108" r="0" fill="#e4dcd0"/>
+          </g>
+
+          <!-- DAY 30: sweater ON sheep (hidden until day 30) -->
+          <g id="sheepSweater" opacity="0" style="transition: opacity 0.8s">
+            <!-- sweater body on sheep -->
+            <ellipse cx="82" cy="112" rx="42" ry="34" fill="#7a60d0" opacity="0.9"/>
+            <!-- sweater texture stripes -->
+            <path d="M42 108 Q82 100 122 108" stroke="#9880e8" stroke-width="2.5" fill="none" opacity="0.6"/>
+            <path d="M42 118 Q82 110 122 118" stroke="#9880e8" stroke-width="2.5" fill="none" opacity="0.6"/>
+            <path d="M44 128 Q82 120 120 128" stroke="#9880e8" stroke-width="2" fill="none" opacity="0.5"/>
+            <!-- collar -->
+            <path d="M65 88 Q82 83 99 88" stroke="#f0c040" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <!-- pattern dots -->
+            <circle cx="70" cy="100" r="2.5" fill="#f0c040" opacity="0.8"/>
+            <circle cx="82" cy="97"  r="2.5" fill="#ffb3c6" opacity="0.8"/>
+            <circle cx="94" cy="100" r="2.5" fill="#f0c040" opacity="0.8"/>
+            <circle cx="70" cy="114" r="2"   fill="#a8d8a8" opacity="0.7"/>
+            <circle cx="94" cy="114" r="2"   fill="#a8d8a8" opacity="0.7"/>
+          </g>
+
+          <!-- FACE -->
+          <ellipse cx="63" cy="73" rx="9" ry="6" fill="#f0dcc8" transform="rotate(-18 63 73)"/>
+          <ellipse cx="101" cy="73" rx="9" ry="6" fill="#f0dcc8" transform="rotate(18 101 73)"/>
+          <ellipse cx="63" cy="73" rx="5.5" ry="3.5" fill="#ecc0a8" transform="rotate(-18 63 73)"/>
+          <ellipse cx="101" cy="73" rx="5.5" ry="3.5" fill="#ecc0a8" transform="rotate(18 101 73)"/>
+          <ellipse cx="82" cy="78" rx="20" ry="18" fill="#f8ecd8"/>
+          <!-- Eyes -->
+          <circle cx="75" cy="75" r="4.5" fill="white"/>
+          <circle cx="89" cy="75" r="4.5" fill="white"/>
+          <circle id="lp" cx="76"  cy="76" r="2.5" fill="#3a2820"/>
+          <circle id="rp" cx="90" cy="76" r="2.5" fill="#3a2820"/>
+          <circle cx="77" cy="75" r="1" fill="white"/>
+          <circle cx="91" cy="75" r="1" fill="white"/>
+          <!-- Nose -->
+          <circle cx="80" cy="82" r="1.5" fill="#e0a090"/>
+          <circle cx="84" cy="82" r="1.5" fill="#e0a090"/>
+          <path d="M79 81.5 Q82 84 85 81.5" stroke="#d09080" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- Mouth -->
+          <path id="mouth" d="M78 86 Q82 89 86 86" stroke="#c08070" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <!-- Blush -->
+          <ellipse id="blL" cx="70" cy="81" rx="5" ry="3" fill="#ffb0a0" opacity="0.45"/>
+          <ellipse id="blR" cx="94" cy="81" rx="5" ry="3" fill="#ffb0a0" opacity="0.45"/>
+
+          <!-- Tap stars flash -->
+          <g id="tapStars" opacity="0" style="transition:opacity 0.2s">
+            <text x="22" y="56" font-size="14">✨</text>
+            <text x="128" y="52" font-size="13">⭐</text>
+            <text x="30" y="130" font-size="11">🌟</text>
+          </g>
+        </svg>
+        <div class="tap-hint" id="tapHint">👆 タップして記録！</div>
+      </div>
+
+      <!-- Sweater (growing beside sheep) -->
+      <div class="sweater-col">
+        <div class="sweater-label">🧶 編み中...</div>
+        <svg class="sweater-svg" id="sweaterSvg" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
+          <!-- Sweater outline (faint, always visible as target) -->
+          <g opacity="0.12">
+            <path d="M20 55 L10 40 L30 32 L38 48 Q50 44 62 48 L70 32 L90 40 L80 55 L75 55 L75 130 L25 130 L25 55 Z" fill="white"/>
+          </g>
+
+          <!-- Sweater fill — clipped by progress -->
+          <!-- Using a clipPath that reveals from bottom up as days increase -->
+          <defs>
+            <clipPath id="sweaterClip">
+              <rect id="sweaterReveal" x="0" y="150" width="100" height="0"/>
+            </clipPath>
+          </defs>
+
+          <!-- Full sweater shape, clipped -->
+          <g clip-path="url(#sweaterClip)">
+            <!-- Main body -->
+            <path d="M22 55 L12 40 L30 33 L38 49 Q50 45 62 49 L70 33 L88 40 L78 55 L74 55 L74 128 L26 128 L26 55 Z" fill="#7a60d0"/>
+            <!-- Sleeves shading -->
+            <path d="M22 55 L12 40 L30 33 L38 49 Z" fill="#6a50c0"/>
+            <path d="M78 55 L88 40 L70 33 L62 49 Z" fill="#6a50c0"/>
+            <!-- Stripes -->
+            <path d="M26 75 L74 75" stroke="#9880e8" stroke-width="2" opacity="0.5"/>
+            <path d="M26 92 L74 92" stroke="#9880e8" stroke-width="2" opacity="0.5"/>
+            <path d="M26 109 L74 109" stroke="#9880e8" stroke-width="1.5" opacity="0.4"/>
+            <!-- Pattern dots -->
+            <circle cx="38" cy="84" r="2.5" fill="#f0c040" opacity="0.85"/>
+            <circle cx="50" cy="80" r="2.5" fill="#ffb3c6" opacity="0.85"/>
+            <circle cx="62" cy="84" r="2.5" fill="#f0c040" opacity="0.85"/>
+            <circle cx="38" cy="100" r="2"   fill="#a8d8a8" opacity="0.75"/>
+            <circle cx="62" cy="100" r="2"   fill="#a8d8a8" opacity="0.75"/>
+            <!-- Collar -->
+            <path d="M36 52 Q50 47 64 52" stroke="#f0c040" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- Ribbing at bottom -->
+            <path d="M26 118 L74 118" stroke="#9880e8" stroke-width="1.5" opacity="0.5"/>
+            <path d="M26 123 L74 123" stroke="#9880e8" stroke-width="1.5" opacity="0.5"/>
+          </g>
+
+          <!-- Knitting needle (disappears on day 30) -->
+          <g id="needleGroup">
+            <line id="needle1" x1="15" y1="140" x2="15" y2="140" stroke="#c8a060" stroke-width="2.5" stroke-linecap="round"/>
+            <line id="needle2" x1="85" y1="140" x2="85" y2="140" stroke="#c8a060" stroke-width="2.5" stroke-linecap="round"/>
+            <circle id="needleTip1" cx="15" cy="140" r="0" fill="#e8c080"/>
+            <circle id="needleTip2" cx="85" cy="140" r="0" fill="#e8c080"/>
+          </g>
+
+          <!-- Yarn ball at bottom -->
+          <g id="yarnBall">
+            <circle cx="50" cy="138" r="0" fill="#9870d8" id="yarnCircle"/>
+            <path id="yarnLines" d="" stroke="#b898e8" stroke-width="1" fill="none" opacity="0.6"/>
+          </g>
+        </svg>
+      </div>
+
+    </div><!-- /scene-wrap -->
+
+    <!-- Progress -->
+    <div class="progress-section">
+      <div class="progress-labels">
+        <span>🌱 スタート</span>
+        <span id="progText">0 / 30日</span>
+        <span>🧶 完成</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Button -->
+    <button class="stamp-btn" id="stampBtn" onclick="doStamp()">🐑 今日の運動を記録する</button>
+  </div>
+
+  <!-- Calendar -->
+  <div class="cal-card">
+    <div class="cal-title">📅 30日カレンダー（⭐=3日ごとマイルストーン）</div>
+    <div class="cal-grid" id="calGrid"></div>
+    <button class="reset-btn" onclick="resetAll()">リセットする</button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- Popup -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup">
+    <span class="pe" id="pEmoji">🐑</span>
+    <h2 id="pTitle">記録しました！</h2>
+    <p id="pMsg">羊の毛が少し増えたよ♪</p>
+    <button class="popup-close" onclick="closePopup()">よし！✨</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  ★ 設定欄 ★  GAS_URLだけ書き換えればOK！
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVU3HJ1yheA2czjDA__uTi_yiOUBcJeoCF0Z8BDDr7lnxUNSwf3aluj0GOxa85hzWJ/exec';
+// ============================================================
+
+const TOTAL = 30;
+const MILESTONES = new Set([3,6,9,12,15,18,21,24,27,30]);
+const USER_ID = new URLSearchParams(window.location.search).get('id') || 'guest';
+const LS_KEY  = 'sleep_sheep_' + USER_ID;
+
+// Wool puff sizes per day
+const WOOL_R = {
+  1:8,2:9,3:9,4:8,5:10,6:9,7:10,8:8,9:11,10:12,
+  11:10,12:11,13:10,14:12,15:13,16:11,17:12,18:10,19:13,20:14,
+  21:12,22:13,23:11,24:14,25:15,26:13,27:14,28:13,29:15
+};
+
+// Floating stars config: [x%, y%, size, delay, label]
+const STAR_CONFIGS = [
+  [12, 18, 18, 0,   '⭐'],
+  [85, 22, 16, 0.3, '🌟'],
+  [8,  55, 14, 0.6, '✨'],
+  [90, 60, 15, 0.9, '⭐'],
+  [18, 80, 13, 1.2, '🌟'],
+  [82, 78, 14, 0.4, '✨'],
+  [50, 8,  16, 0.7, '⭐'],
+  [30, 12, 12, 1.0, '🌟'],
+  [70, 14, 13, 0.2, '✨'],
+  [5,  35, 11, 1.5, '⭐'],
+];
+
+const MSGS = [
+  '今日も運動してみよう！🌙','いい感じ！続けよう✨','3日達成！リズムがついてきた♪',
+  '羊の毛がふわふわしてきたよ🐑','5日間！素晴らしい！🌿','1週間まであと少し⭐',
+  '7日達成！1週間おめでとう🎉','体が少し軽くなってきた？✨','羊がにっこりしてるよ🐑',
+  '10日達成！3分の1終了！🌟','体が変わってきた予感？','12日！羊の毛がもこもこ🐑',
+  '2週間まであと1日！','14日達成！2週間おめでとう🎉','折り返しが近い！',
+  '16日！半分を越えた🌙','毎日続けるって、すごいこと✨','18日！羊がとても幸せそう🐑',
+  'あと11日、もう少し！','20日達成！ここまで来た！🌟','21日！習慣になってきた？',
+  '22日、体のリズムを感じて🌙','残り7日、ゴールが見えてきた✨','24日！セーターほぼ完成🧶',
+  '25日達成！あと5日！','26日、もう少し！','27日！セーターの仕上げ🧶',
+  '残り2日！信じられない！','ラスト1日！本当にすごい✨','30日達成！セーター完成！🎉🧶',
+];
+
+const POPUPS = [
+  {e:'🐑',t:'1日目スタート！',   m:'よし、はじめの一歩！\n羊の毛が少し増えたよ♪'},
+  {e:'✨',t:'2日目！',           m:'いいペース！続けよう\nセーターも編み始めたよ🧶'},
+  {e:'⭐',t:'3日連続！',         m:'3日達成！\n夜空に星がひとつ増えたよ⭐\nリズムに乗ってきた♪'},
+  {e:'🐑',t:'4日目！',           m:'毛がふわふわしてきたよ🐑'},
+  {e:'🌟',t:'5日達成！',         m:'素晴らしい！5日間続けた自分を\nほめてあげよう'},
+  {e:'⭐',t:'6日目！',           m:'また星が増えたよ⭐\n1週間まであと少し！'},
+  {e:'🎉',t:'1週間達成！',       m:'7日間おめでとう！\nはじめの山を越えたよ！\nセーターも育ってる🧶'},
+  {e:'🐑',t:'8日目！',           m:'体が少し軽くなってきた？'},
+  {e:'⭐',t:'9日目！',           m:'また星がひとつ増えたよ🌟\nあと1日で10日！'},
+  {e:'🌟',t:'10日達成！',        m:'すごい！3分の1終了！\n羊の毛もセーターもぐんぐん育ってる♪'},
+  {e:'✨',t:'11日目！',          m:'毎日の積み重ねって\nほんとうにすごいね'},
+  {e:'⭐',t:'12日目！',          m:'また星が増えたよ⭐\nもこもこになってきた！'},
+  {e:'🐑',t:'13日目！',          m:'2週間まであと1日！'},
+  {e:'🎉',t:'2週間達成！',       m:'14日間おめでとう！\n折り返しが近いよ！えらい✨'},
+  {e:'⭐',t:'15日目！',          m:'また星がひとつ✨\nここまで来たね！'},
+  {e:'🌙',t:'折り返し！',        m:'16日、ちょうど折り返し！\n後半もいっしょに頑張ろう♪'},
+  {e:'🐑',t:'17日目！',          m:'体のリズムが整ってきた感じ？'},
+  {e:'⭐',t:'18日目！',          m:'また星が増えたよ⭐\n毎日続けているからだよ！'},
+  {e:'✨',t:'19日目！',          m:'あと11日！もう少し！'},
+  {e:'🌟',t:'20日達成！',        m:'20日間！ここまで来たの、\nほんとうにすごいことだよ💫'},
+  {e:'⭐',t:'21日目！',          m:'また星がひとつ🌟\n習慣になってきたんじゃないかな？'},
+  {e:'🐑',t:'22日目！',          m:'残り8日！セーターが見えてきた'},
+  {e:'✨',t:'23日目！',          m:'残り7日！ゴールまでもう少し'},
+  {e:'⭐',t:'24日目！',          m:'また星が増えたよ⭐\nセーターほぼ完成！'},
+  {e:'🌟',t:'25日達成！',        m:'あと5日！ゴールが目の前！\n本当に素晴らしい✨'},
+  {e:'🧶',t:'26日目！',          m:'あと4日！セーターほぼ完成！'},
+  {e:'⭐',t:'27日目！',          m:'また星がひとつ🌟\nあと3日！もう一息！'},
+  {e:'✨',t:'28日目！',          m:'残り2日！信じられないくらい\n来たね！すごい！'},
+  {e:'🌙',t:'ラスト1日！',       m:'明日で完成！\n今夜はゆっくり眠れそう🌙'},
+  {e:'🧶',t:'30日完成！！！',    m:'おめでとう！！！🎉🎉\n30日間やり遂げた！\n羊がセーターを着てるよ🐑🧶\n本当におつかれさまでした♪'},
+];
+
+// ─── State ─────────────────────────────────────────
+let stamps = [], todayDone = false;
+
+// ─── Background stars (static, always) ────────────
+function initBgStars() {
+  const container = document.getElementById('bgStars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'bg-star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      animation-duration:${Math.random()*3+2}s;
+      animation-delay:${Math.random()*3}s;
+    `;
+    container.appendChild(s);
+  }
+}
+
+// ─── Floating milestone stars ──────────────────────
+function initFloatStars() {
+  const container = document.getElementById('floatStars');
+  container.innerHTML = '';
+  const n = cnt();
+  const visibleCount = Math.floor(n / 3); // 1 star per 3 days
+  STAR_CONFIGS.forEach((cfg, idx) => {
+    const el = document.createElement('div');
+    el.className = 'fstar' + (idx < visibleCount ? ' visible' : '');
+    el.textContent = cfg[4];
+    el.style.cssText = `
+      left:${cfg[0]}%;top:${cfg[1]}%;
+      font-size:${cfg[2]}px;
+      animation-delay:${cfg[3]}s;
+      animation-duration:${2.5 + idx * 0.3}s;
+    `;
+    container.appendChild(el);
+  });
+}
+
+// ─── Sweater progress ─────────────────────────────
+function updateSweater(n) {
+  if (n >= 30) {
+    // Day 30: hide knitting needles, fully reveal sweater in clip
+    document.getElementById('sweaterReveal').setAttribute('y', 0);
+    document.getElementById('sweaterReveal').setAttribute('height', 150);
+    document.getElementById('needleGroup').style.opacity = '0';
+    document.getElementById('yarnCircle').setAttribute('r', 0);
+    // Show sweater ON sheep
+    document.getElementById('sheepSweater').style.opacity = '1';
+    // Hide wool
+    document.getElementById('woolGroup').style.opacity = '0';
+    document.getElementById('woolGroup').style.transition = 'opacity 1s';
+    // Hide sweater label
+    const lbl = document.querySelector('.sweater-label');
+    if (lbl) lbl.textContent = '🧶 完成！';
+    return;
+  }
+
+  // Days 1-29: reveal sweater from bottom
+  // Sweater body goes from y=55 to y=128 (height 73), sleeves from ~y=33
+  // We reveal from bottom: clipRect y goes from 150 → ~33 over 29 days
+  const pct = n / 29;
+  const revealY = 150 - Math.round(pct * 120); // 150→30
+  const revealH = 150 - revealY;
+  document.getElementById('sweaterReveal').setAttribute('y', revealY);
+  document.getElementById('sweaterReveal').setAttribute('height', revealH);
+
+  // Knitting needles (animate them)
+  if (n > 0) {
+    const needleTop = Math.max(revealY - 15, 20);
+    document.getElementById('needle1').setAttribute('y1', 150);
+    document.getElementById('needle1').setAttribute('y2', needleTop);
+    document.getElementById('needle2').setAttribute('y1', 150);
+    document.getElementById('needle2').setAttribute('y2', needleTop);
+    document.getElementById('needleTip1').setAttribute('cy', needleTop);
+    document.getElementById('needleTip1').setAttribute('r', 3);
+    document.getElementById('needleTip2').setAttribute('cy', needleTop);
+    document.getElementById('needleTip2').setAttribute('r', 3);
+
+    // Yarn ball
+    const yarnR = Math.min(4 + n * 0.4, 12);
+    document.getElementById('yarnCircle').setAttribute('r', yarnR);
+    // Yarn lines
+    document.getElementById('yarnLines').setAttribute('d',
+      `M${50-yarnR+2} 138 Q50 ${138-yarnR} ${50+yarnR-2} 138`
+    );
+  }
+}
+
+// ─── Wool update ──────────────────────────────────
+function updateWool(n) {
+  if (n >= 30) return; // handled by sweater
+  document.querySelectorAll('.wp').forEach(el => {
+    const d = parseInt(el.dataset.day);
+    el.setAttribute('r', n >= d ? (WOOL_R[d] || 10) : 0);
+  });
+  // Mouth
+  const m = document.getElementById('mouth');
+  if (m) {
+    if (n >= 20) m.setAttribute('d','M76 86 Q82 91 88 86');
+    else if (n >= 10) m.setAttribute('d','M77 86 Q82 90 87 86');
+    else m.setAttribute('d','M78 86 Q82 89 86 86');
+  }
+  // Blush
+  const op = (0.45 + (n/TOTAL)*0.35).toFixed(2);
+  const bl = document.getElementById('blL'), br = document.getElementById('blR');
+  if (bl) bl.setAttribute('opacity', op);
+  if (br) br.setAttribute('opacity', op);
+}
+
+// ─── Loading ──────────────────────────────────────
+function hideLoading() {
+  const ov = document.getElementById('loadingOverlay');
+  ov.classList.add('hide');
+  setTimeout(() => ov.style.display='none', 500);
+}
+
+// ─── Saving badge ─────────────────────────────────
+function showSaving(text, spinning=true) {
+  document.getElementById('savingText').textContent = text;
+  document.getElementById('savingDot').className = 'saving-dot'+(spinning?' spin':'');
+  document.getElementById('savingBadge').classList.add('show');
+}
+function hideSaving(successText=null) {
+  const badge = document.getElementById('savingBadge');
+  if (successText) {
+    document.getElementById('savingText').textContent = successText;
+    document.getElementById('savingDot').className = 'saving-dot';
+    setTimeout(() => badge.classList.remove('show'), 1800);
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+// ─── GAS communication ────────────────────────────
+async function load() {
+  try {
+    const local = localStorage.getItem(LS_KEY);
+    if (local) {
+      stamps = JSON.parse(local);
+      const today = new Date().toDateString();
+      if (stamps.length && stamps[stamps.length-1] === today) todayDone = true;
+    }
+  } catch(e) {}
+
+  if (!GAS_URL || GAS_URL.includes('ここに')) { hideLoading(); return; }
+
+  try {
+    const res = await fetch(`${GAS_URL}?id=${encodeURIComponent(USER_ID)}`);
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if (data.stamps) {
+      const remote = JSON.parse(data.stamps);
+      if (remote.length >= stamps.length) {
+        stamps = remote;
+        todayDone = false;
+        const today = new Date().toDateString();
+        if (stamps.length && stamps[stamps.length-1] === today) todayDone = true;
+        localStorage.setItem(LS_KEY, JSON.stringify(stamps));
+      }
+    }
+  } catch(e) {
+    console.warn('読み込み失敗（ローカルで続行）:', e);
+  } finally {
+    hideLoading();
+  }
+}
+
+async function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(stamps)); } catch(e) {}
+  if (!GAS_URL || GAS_URL.includes('ここに')) return;
+  showSaving('保存中...', true);
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'text/plain'},
+      body: JSON.stringify({id: USER_ID, stamps: JSON.stringify(stamps)})
+    });
+    if (!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if (data.status === 'success') { hideSaving('✅ 保存しました'); }
+    else throw new Error('GAS error');
+  } catch(e) {
+    console.warn('保存失敗:', e);
+    hideSaving();
+    const eb = document.getElementById('errorBanner');
+    eb.classList.add('show');
+    setTimeout(() => eb.classList.remove('show'), 5000);
+  }
+}
+
+function cnt() { return stamps.length; }
+
+// ─── UI update ────────────────────────────────────
+function updateUI() {
+  const n = cnt();
+  document.getElementById('progFill').style.width = (n/TOTAL*100)+'%';
+  document.getElementById('progText').textContent = n+' / 30日';
+  document.getElementById('dayNum').innerHTML = Math.min(n+1,30)+'<span>日目</span>';
+  document.getElementById('dayMsg').textContent = MSGS[Math.min(n,29)];
+
+  updateWool(n);
+  updateSweater(n);
+  initFloatStars();
+
+  // Button & hint
+  const btn = document.getElementById('stampBtn');
+  const hint = document.getElementById('tapHint');
+  if (todayDone || n >= TOTAL) {
+    btn.textContent = n >= TOTAL ? '🧶 30日完了！おめでとう！' : '✅ 今日は記録済み！';
+    btn.disabled = true; btn.className = 'stamp-btn done';
+    hint.textContent = n >= TOTAL ? '🧶 セーター完成！' : '✅ 今日は完了！';
+    hint.style.color = '#7bc47b'; hint.style.animation = 'none';
+  } else {
+    btn.textContent = '🐑 今日の運動を記録する';
+    btn.disabled = false; btn.className = 'stamp-btn';
+    hint.textContent = '👆 タップして記録！';
+    hint.style.color = ''; hint.style.animation = '';
+  }
+
+  if (n >= TOTAL) document.getElementById('completion').classList.add('show');
+  buildCal();
+}
+
+function buildCal() {
+  const g = document.getElementById('calGrid'); g.innerHTML = '';
+  const n = cnt();
+  for (let i = 1; i <= TOTAL; i++) {
+    const el = document.createElement('div'); el.className = 'cal-day'; el.textContent = i;
+    const ms = MILESTONES.has(i);
+    if (i <= n) el.classList.add(ms ? 'milestone-done' : 'done');
+    else if (i === n+1 && !todayDone) el.classList.add('today');
+    else { el.classList.add('future'); if (ms) el.classList.add('milestone-upcoming'); }
+    g.appendChild(el);
+  }
+}
+
+// ─── Interactions ─────────────────────────────────
+function tapSheep() {
+  if (todayDone || cnt() >= TOTAL) return;
+  const w = document.getElementById('sheepCol');
+  w.style.transform = 'scale(1.08) rotate(3deg)';
+  setTimeout(() => w.style.transform = 'scale(1) rotate(-2deg)', 110);
+  setTimeout(() => w.style.transform = 'scale(1)', 230);
+  document.getElementById('tapStars').style.opacity = '1';
+  setTimeout(() => document.getElementById('tapStars').style.opacity = '0', 600);
+}
+
+async function doStamp() {
+  if (todayDone || cnt() >= TOTAL) return;
+  stamps.push(new Date().toDateString()); todayDone = true;
+  await save();
+  const n = cnt();
+
+  // Bounce
+  const w = document.getElementById('sheepCol');
+  w.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+  w.style.transform = 'scale(1.18)';
+  setTimeout(() => w.style.transform = 'scale(1)', 350);
+
+  launchParticles(MILESTONES.has(n) ? 40 : 16);
+  updateUI();
+
+  // Milestone alert
+  if (MILESTONES.has(n) && n < TOTAL) {
+    const starCount = n / 3;
+    const al = document.getElementById('milestoneAlert');
+    al.textContent = `⭐ ${n}日達成！夜空に星がまた増えたよ（${starCount}個目）`;
+    al.classList.remove('show'); void al.offsetWidth; al.classList.add('show');
+    setTimeout(() => al.classList.remove('show'), 4500);
+  }
+
+  // Popup
+  const pm = POPUPS[Math.min(n-1, POPUPS.length-1)];
+  document.getElementById('pEmoji').textContent = pm.e;
+  document.getElementById('pTitle').textContent = pm.t;
+  document.getElementById('pMsg').textContent   = pm.m;
+  document.getElementById('popupOverlay').classList.add('show');
+}
+
+function launchParticles(c) {
+  const cols = ['#ffb3c6','#c8b4e8','#ffe08a','#a8e8c8','#d4c8ff','#80c8ff'];
+  const shapes = ['50%','30%','0%'];
+  const cx = window.innerWidth/2, cy = window.innerHeight*0.4;
+  for (let i = 0; i < c; i++) {
+    const p = document.createElement('div'); p.className = 'particle';
+    const sz = Math.random()*12+5;
+    p.style.cssText = `left:${cx+(Math.random()-.5)*180}px;top:${cy}px;
+      width:${sz}px;height:${sz}px;
+      background:${cols[Math.floor(Math.random()*cols.length)]};
+      border-radius:${shapes[Math.floor(Math.random()*shapes.length)]};
+      animation-duration:${Math.random()*.9+.8}s;
+      animation-delay:${Math.random()*.4}s;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2500);
+  }
+}
+
+function closePopup() { document.getElementById('popupOverlay').classList.remove('show'); }
+
+async function resetAll() {
+  if (!confirm('30日の記録をすべてリセットしますか？')) return;
+  stamps = []; todayDone = false;
+  await save();
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
+  document.getElementById('completion').classList.remove('show');
+  // Reset sweater & wool visuals
+  document.getElementById('sheepSweater').style.opacity = '0';
+  document.getElementById('woolGroup').style.opacity = '1';
+  updateUI();
+}
+
+// ─── Init ─────────────────────────────────────────
+initBgStars();
+load().then(() => updateUI());
+</script>
+</body>
+</html>
